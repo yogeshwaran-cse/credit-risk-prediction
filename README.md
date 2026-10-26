@@ -42,7 +42,7 @@ credit score/
 * Employs stratified train-test splitting ($70/30$) to strictly prevent data leakage before transformations.
 
 ### 2. Business Anomaly Filtering & Data Hygiene
-* **Anomaly Removal**: Filters out loan records where processing fees exceed compliant retail limits ($\frac{\text{processing\_fee}}{\text{loan\_amount}} \ge 3\%$).
+* **Anomaly Removal**: Filters out loan records where processing fees exceed compliant retail limits.
 * **Categorical Normalization**: Corrects categorical inconsistencies (e.g., `'Personaal'` $\rightarrow$ `'Personal'`).
 * **Imputation**: Imputes missing entries in `residence_type` using the training distribution mode.
 
