@@ -162,8 +162,8 @@ for key, val in DEFAULT_VALUES.items():
 if "active_case_key" not in st.session_state:
     st.session_state["active_case_key"] = None
 
-if "trigger_prediction" not in st.session_state:
-    st.session_state["trigger_prediction"] = False
+if "prediction_result" not in st.session_state:
+    st.session_state["prediction_result"] = None
 
 
 def load_test_case_data(case_key: str):
@@ -172,12 +172,12 @@ def load_test_case_data(case_key: str):
         for k, v in TEST_CASES[case_key]["data"].items():
             st.session_state[f"field_{k}"] = v
         st.session_state["active_case_key"] = case_key
-        st.session_state["trigger_prediction"] = True
+        st.session_state["prediction_result"] = None
     elif case_key in ["reset", "↺ Custom / Reset"]:
         for k, v in DEFAULT_VALUES.items():
             st.session_state[f"field_{k}"] = v
         st.session_state["active_case_key"] = None
-        st.session_state["trigger_prediction"] = False
+        st.session_state["prediction_result"] = None
 
 
 def on_pill_changed():
@@ -297,68 +297,67 @@ selected_pill = st.pills(
 active_key = st.session_state["active_case_key"]
 if active_key in TEST_CASES:
     info = TEST_CASES[active_key]
-    st.info(f"**Loaded {info['full_name']}** — {info['description']} *(Expected Score: {info['expected_score']} | Rating: {info['expected_rating']})*")
+    st.info(f"**Loaded {info['full_name']}** — {info['description']} *(Expected Score: {info['expected_score']} | Rating: {info['expected_rating']})* — Click **Calculate Credit Score** below to evaluate.")
 else:
-    st.caption("ℹ️ Form active with custom values. You can tweak any input below or select a benchmark test case above.")
+    st.caption("ℹ️ Form active with custom values. You can tweak any input below and click **Calculate Credit Score**.")
 
 st.write("")
 
-# ----------------- 3 Columns, Multiple Rows (Preserved Exact Layout) -----------------
+# ----------------- 3 Columns, Multiple Rows (Form Encapsulation) -----------------
+with st.form("loan_details_form", border=False):
+    # Row 1: Personal & Residence Details
+    row1_col1, row1_col2, row1_col3 = st.columns(3)
+    with row1_col1:
+        age = st.number_input("Age", min_value=18, max_value=90, step=1, key="field_age")
 
-# Row 1: Personal & Residence Details
-row1_col1, row1_col2, row1_col3 = st.columns(3)
-with row1_col1:
-    age = st.number_input("Age", min_value=18, max_value=90, step=1, key="field_age")
+    with row1_col2:
+        income = st.number_input("Annual Income (₹)", min_value=10000, max_value=50000000, step=25000, key="field_income")
 
-with row1_col2:
-    income = st.number_input("Annual Income (₹)", min_value=10000, max_value=50000000, step=25000, key="field_income")
+    with row1_col3:
+        residence_type = st.selectbox("Residence Type", options=["Owned", "Rented", "Mortgage"], key="field_residence_type")
 
-with row1_col3:
-    residence_type = st.selectbox("Residence Type", options=["Owned", "Rented", "Mortgage"], key="field_residence_type")
+    # Row 2: Loan Amount, Purpose & Type
+    row2_col1, row2_col2, row2_col3 = st.columns(3)
+    with row2_col1:
+        loan_amount = st.number_input("Loan Amount (₹)", min_value=10000, max_value=25000000, step=10000, key="field_loan_amount")
 
-# Row 2: Loan Amount, Purpose & Type
-row2_col1, row2_col2, row2_col3 = st.columns(3)
-with row2_col1:
-    loan_amount = st.number_input("Loan Amount (₹)", min_value=10000, max_value=25000000, step=10000, key="field_loan_amount")
+    with row2_col2:
+        loan_purpose = st.selectbox("Loan Purpose", options=["Personal", "Home", "Education", "Auto"], key="field_loan_purpose")
 
-with row2_col2:
-    loan_purpose = st.selectbox("Loan Purpose", options=["Personal", "Home", "Education", "Auto"], key="field_loan_purpose")
+    with row2_col3:
+        loan_type = st.selectbox("Loan Type", options=["Secured", "Unsecured"], key="field_loan_type")
 
-with row2_col3:
-    loan_type = st.selectbox("Loan Type", options=["Secured", "Unsecured"], key="field_loan_type")
+    # Row 3: Loan Tenure, Credit Utilization & Open Accounts
+    row3_col1, row3_col2, row3_col3 = st.columns(3)
+    with row3_col1:
+        loan_tenure_months = st.number_input("Loan Tenure (Months)", min_value=6, max_value=120, step=1, key="field_loan_tenure_months")
 
-# Row 3: Loan Tenure, Credit Utilization & Open Accounts
-row3_col1, row3_col2, row3_col3 = st.columns(3)
-with row3_col1:
-    loan_tenure_months = st.number_input("Loan Tenure (Months)", min_value=6, max_value=120, step=1, key="field_loan_tenure_months")
+    with row3_col2:
+        credit_utilization_ratio = st.number_input("Credit Utilization Ratio (%)", min_value=0.0, max_value=100.0, step=1.0, key="field_credit_utilization_ratio")
 
-with row3_col2:
-    credit_utilization_ratio = st.number_input("Credit Utilization Ratio (%)", min_value=0.0, max_value=100.0, step=1.0, key="field_credit_utilization_ratio")
+    with row3_col3:
+        number_of_open_accounts = st.number_input("Number of Open Accounts", min_value=1, max_value=4, step=1, key="field_number_of_open_accounts")
 
-with row3_col3:
-    number_of_open_accounts = st.number_input("Number of Open Accounts", min_value=1, max_value=4, step=1, key="field_number_of_open_accounts")
+    # Row 4: Past Loan History & Delinquencies
+    row4_col1, row4_col2, row4_col3 = st.columns(3)
+    with row4_col1:
+        total_loan_months = st.number_input("Total Loan History (Months)", min_value=1, max_value=120, step=1, key="field_total_loan_months")
 
-# Row 4: Past Loan History & Delinquencies
-row4_col1, row4_col2, row4_col3 = st.columns(3)
-with row4_col1:
-    total_loan_months = st.number_input("Total Loan History (Months)", min_value=1, max_value=120, step=1, key="field_total_loan_months")
+    with row4_col2:
+        delinquent_months = st.number_input("Delinquent Months", min_value=0, max_value=60, step=1, key="field_delinquent_months")
 
-with row4_col2:
-    delinquent_months = st.number_input("Delinquent Months", min_value=0, max_value=60, step=1, key="field_delinquent_months")
+    with row4_col3:
+        total_dpd = st.number_input("Total Days Past Due (DPD)", min_value=0, max_value=365, step=1, key="field_total_dpd")
 
-with row4_col3:
-    total_dpd = st.number_input("Total Days Past Due (DPD)", min_value=0, max_value=365, step=1, key="field_total_dpd")
+    st.write("")
 
-st.write("")
+    # Form submission button
+    calc_clicked = st.form_submit_button("Calculate Credit Score", type="primary", use_container_width=True)
 
 # ----------------- Predict Action -----------------
-calc_clicked = st.button("Calculate Credit Score", type="primary", use_container_width=True)
-
-should_predict = calc_clicked or st.session_state["trigger_prediction"]
-
-if should_predict:
+if calc_clicked:
     try:
-        result = ph.predict(
+        st.session_state["prediction_result"] = ph.predict(
             age=age,
             income=income,
             loan_amount=loan_amount,
@@ -372,74 +371,76 @@ if should_predict:
             loan_purpose=loan_purpose,
             loan_type=loan_type
         )
+    except Exception as e:
+        st.error(f"Error computing prediction: {e}")
 
-        st.divider()
+result = st.session_state.get("prediction_result")
 
-        # Primary Results in 3 Columns
-        res1, res2, res3 = st.columns(3)
+if result is not None:
+    st.divider()
 
-        with res1:
-            st.markdown(f"""
-            <div class="metric-box">
-                <div class="metric-title">Estimated Credit Score</div>
-                <div class="metric-score" style="color: {result['status_color']};">{result['credit_score']}</div>
-                <div class="metric-sub" style="color: {result['status_color']};">{result['rating']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    # Primary Results in 3 Columns
+    res1, res2, res3 = st.columns(3)
 
-        with res2:
-            st.markdown(f"""
-            <div class="metric-box">
-                <div class="metric-title">Default Probability</div>
-                <div class="metric-score" style="color: {result['status_color']};">{result['probability_pct']}%</div>
-                <div class="metric-sub" style="color: {result['status_color']};">{result['risk_tier']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with res3:
-            decision_text = "Approved" if result['prediction'] == 0 else "High Risk"
-            st.markdown(f"""
-            <div class="metric-box">
-                <div class="metric-title">Recommendation</div>
-                <div class="metric-score" style="color: {result['status_color']}; font-size: 22px; padding-top: 4px;">{decision_text}</div>
-                <div class="metric-sub" style="color: {result['status_color']};">{result['recommendation']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Visual Credit Score Spectrum Bar
-        score_val = result['credit_score']
-        gauge_pct = min(max((score_val - 300) / (850 - 300) * 100, 0), 100)
-
+    with res1:
         st.markdown(f"""
-        <div class="gauge-wrapper">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 12px; font-weight: 700; color: #475569;">CREDIT SCORE SPECTRUM</span>
-                <span style="font-size: 13px; font-weight: 800; color: {result['status_color']};">Score: {score_val} / 850</span>
-            </div>
-            <div class="gauge-bar-bg">
-                <div class="gauge-pointer" style="left: {gauge_pct}%;"></div>
-            </div>
-            <div class="gauge-labels">
-                <span>300 (Poor)</span>
-                <span>465 (Subprime)</span>
-                <span>575 (Fair)</span>
-                <span>685 (Good)</span>
-                <span>850 (Prime)</span>
-            </div>
+        <div class="metric-box">
+            <div class="metric-title">Estimated Credit Score</div>
+            <div class="metric-score" style="color: {result['status_color']};">{result['credit_score']}</div>
+            <div class="metric-sub" style="color: {result['status_color']};">{result['rating']}</div>
         </div>
         """, unsafe_allow_html=True)
 
-        # Financial Ratios in 3 Columns
-        ratio1, ratio2, ratio3 = st.columns(3)
-        with ratio1:
-            st.metric("Loan-to-Income (LTI)", f"{result['loan_to_income']}x")
-        with ratio2:
-            st.metric("Delinquency Ratio", f"{result['delinquency_ratio'] * 100:.1f}%")
-        with ratio3:
-            st.metric("Avg DPD per Delinquency", f"{result['avg_dpd_per_delinquency']} days")
+    with res2:
+        st.markdown(f"""
+        <div class="metric-box">
+            <div class="metric-title">Default Probability</div>
+            <div class="metric-score" style="color: {result['status_color']};">{result['probability_pct']}%</div>
+            <div class="metric-sub" style="color: {result['status_color']};">{result['risk_tier']}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    except Exception as e:
-        st.error(f"Error computing prediction: {e}")
+    with res3:
+        decision_text = "Approved" if result['prediction'] == 0 else "High Risk"
+        st.markdown(f"""
+        <div class="metric-box">
+            <div class="metric-title">Recommendation</div>
+            <div class="metric-score" style="color: {result['status_color']}; font-size: 22px; padding-top: 4px;">{decision_text}</div>
+            <div class="metric-sub" style="color: {result['status_color']};">{result['recommendation']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Visual Credit Score Spectrum Bar
+    score_val = result['credit_score']
+    gauge_pct = min(max((score_val - 300) / (850 - 300) * 100, 0), 100)
+
+    st.markdown(f"""
+    <div class="gauge-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; font-weight: 700; color: #475569;">CREDIT SCORE SPECTRUM</span>
+            <span style="font-size: 13px; font-weight: 800; color: {result['status_color']};">Score: {score_val} / 850</span>
+        </div>
+        <div class="gauge-bar-bg">
+            <div class="gauge-pointer" style="left: {gauge_pct}%;"></div>
+        </div>
+        <div class="gauge-labels">
+            <span>300 (Poor)</span>
+            <span>465 (Subprime)</span>
+            <span>575 (Fair)</span>
+            <span>685 (Good)</span>
+            <span>850 (Prime)</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Financial Ratios in 3 Columns
+    ratio1, ratio2, ratio3 = st.columns(3)
+    with ratio1:
+        st.metric("Loan-to-Income (LTI)", f"{result['loan_to_income']}x")
+    with ratio2:
+        st.metric("Delinquency Ratio", f"{result['delinquency_ratio'] * 100:.1f}%")
+    with ratio3:
+        st.metric("Avg DPD per Delinquency", f"{result['avg_dpd_per_delinquency']} days")
 
 # ----------------- Benchmark Matrix Expander -----------------
 st.write("")
