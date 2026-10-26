@@ -96,7 +96,7 @@ The application includes **5 pre-calibrated benchmark test cases** derived from 
 * **🔴 Case 5: Poor (D)**: Maxed card usage (97%), 18 delinquent months, 85 DPD $\rightarrow$ **Score: 352 | Critical Risk (90.6% default)**
 
 ### Interactive UI Features
-* **Capsule Pill Selector (`st.pills`) & Sidebar Presets**: 1-click loading of any test case to automatically populate all 12 input fields.
+* **Capsule Pill Selector (`st.pills`)**: 1-click loading of any benchmark test case directly on the main page to automatically populate all 12 input fields.
 * **Input Layout (3 Columns per Row)**:
   * **Row 1 (Personal & Residence)**: `Age`, `Annual Income (₹)`, `Residence Type`
   * **Row 2 (Loan Terms)**: `Loan Amount (₹)`, `Loan Purpose`, `Loan Type`

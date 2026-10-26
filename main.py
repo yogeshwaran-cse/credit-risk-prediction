@@ -6,7 +6,8 @@ import prediction_helper as ph
 st.set_page_config(
     page_title="Credit Score & Risk Predictor",
     page_icon="💳",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 # ----------------- Curated Benchmark Test Cases -----------------
@@ -275,40 +276,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-# ----------------- Sidebar Quick Controls -----------------
-with st.sidebar:
-    st.markdown("### 🧪 Test Cases Preset")
-    st.caption("Select a pre-calibrated scenario from the credit risk dataset to immediately populate and evaluate.")
-    
-    dropdown_options = ["-- Select a Test Case --"] + list(TEST_CASES.keys())
-    selected_from_dropdown = st.selectbox(
-        "Choose Test Scenario",
-        options=dropdown_options,
-        index=0,
-        key="dropdown_test_case"
-    )
-
-    col_load, col_rst = st.columns(2)
-    with col_load:
-        if st.button("📥 Load", use_container_width=True, type="primary"):
-            if selected_from_dropdown in TEST_CASES:
-                load_test_case_data(selected_from_dropdown)
-                st.rerun()
-    with col_rst:
-        if st.button("↺ Reset", use_container_width=True):
-            load_test_case_data("reset")
-            st.rerun()
-
-    st.divider()
-    st.markdown("#### 🎯 Scorecard Grading")
-    st.markdown("""
-    - **768 - 850**: 🟢 Prime (AAA) — Prime Rate
-    - **685 - 767**: 🟢 Good (AA) — Standard Terms
-    - **575 - 684**: 🟡 Fair (BBB) — Review
-    - **465 - 574**: 🟠 Subprime (B) — Collateral
-    - **300 - 464**: 🔴 Poor (D) — Decline
-    """)
 
 # ----------------- Main Header -----------------
 st.markdown('<div class="main-title">💳 Credit Score & Risk Prediction</div>', unsafe_allow_html=True)
