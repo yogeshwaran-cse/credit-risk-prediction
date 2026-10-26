@@ -86,25 +86,28 @@ $$\text{Credit Score} = 300 + (1 - P(\text{Default})) \times 550$$
 
 ---
 
-## 🖥️ Streamlit Web Application
 
-The user interface (`main.py`) provides a clean, minimal, non-cluttered workflow organized into a **3-column multi-row layout**:
+### Test Cases & Scenario Presets
+The application includes **5 pre-calibrated benchmark test cases** derived from actual retail portfolio borrower records covering the entire credit risk continuum:
+* **🟢 Case 1: Prime (AAA)**: Low utilization (7%), high income, zero delinquencies $\rightarrow$ **Score: 850 | Very Low Risk (0.0% default)**
+* **🟢 Case 2: Good (AA)**: Clean repayment track record, home secured loan $\rightarrow$ **Score: 727 | Low Risk (22.3% default)**
+* **🟡 Case 3: Fair (BBB)**: Higher leverage, 9 delinquent months, 42 DPD $\rightarrow$ **Score: 646 | Moderate Risk (37.1% default)**
+* **🟠 Case 4: Subprime (B)**: Unsecured loan, 96% card usage, 8 delinquent months $\rightarrow$ **Score: 517 | High Risk (60.6% default)**
+* **🔴 Case 5: Poor (D)**: Maxed card usage (97%), 18 delinquent months, 85 DPD $\rightarrow$ **Score: 352 | Critical Risk (90.6% default)**
 
-### Input Layout (3 Columns per Row)
-* **Row 1 (Personal & Residence)**: `Age`, `Annual Income (₹)`, `Residence Type` (Owned, Rented, Mortgage)
-* **Row 2 (Loan Terms)**: `Loan Amount (₹)`, `Loan Purpose` (Personal, Home, Education, Auto), `Loan Type` (Secured, Unsecured)
-* **Row 3 (Tenure & Credit Usage)**: `Loan Tenure (Months)`, `Credit Utilization Ratio (%)`, `Number of Open Accounts`
-* **Row 4 (Repayment History)**: `Total Loan History (Months)`, `Delinquent Months`, `Total Days Past Due (DPD)`
+### Interactive UI Features
+* **Capsule Pill Selector (`st.pills`) & Sidebar Presets**: 1-click loading of any test case to automatically populate all 12 input fields.
+* **Input Layout (3 Columns per Row)**:
+  * **Row 1 (Personal & Residence)**: `Age`, `Annual Income (₹)`, `Residence Type`
+  * **Row 2 (Loan Terms)**: `Loan Amount (₹)`, `Loan Purpose`, `Loan Type`
+  * **Row 3 (Tenure & Credit Usage)**: `Loan Tenure (Months)`, `Credit Utilization Ratio (%)`, `Number of Open Accounts`
+  * **Row 4 (Repayment History)**: `Total Loan History (Months)`, `Delinquent Months`, `Total Days Past Due (DPD)`
+* **Assessment Output**:
+  * **Primary Metric Cards (3 Columns)**: Estimated Credit Score, Default Probability, and Underwriting Recommendation.
+  * **Dynamic Credit Score Spectrum Meter**: Visual progress indicator showing borrower's position on the $300\text{--}850$ continuum across credit bands.
+  * **Computed Financial Ratios (3 Columns)**: Loan-to-Income (LTI), Delinquency Ratio, Avg DPD per Delinquency.
+  * **Benchmark Evaluation Matrix**: Collapsible side-by-side comparison table of all 5 standard test cases.
 
-### Assessment Output
-* **Primary Metric Cards (3 Columns)**:
-  * **Estimated Credit Score** (with Rating Tag)
-  * **Default Probability** (with Risk Tier Tag)
-  * **Underwriting Recommendation** (Approved / High Risk)
-* **Computed Financial Health Ratios (3 Columns)**:
-  * `Loan-to-Income (LTI)`
-  * `Delinquency Ratio`
-  * `Avg DPD per Delinquency`
 
 ---
 
